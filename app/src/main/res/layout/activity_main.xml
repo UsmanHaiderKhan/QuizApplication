@@ -10,15 +10,30 @@
 
     <TextView
         android:id="@+id/text_view"
+        android:textColor="@color/textWhite"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="AI Base Quiz Application"
-        android:textSize="27dp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="30dp"
-        android:fontFamily="Old English Gothic font"
-        />
+        android:text="AI Base Quiz Application"
+        android:textSize="27dp" />
 
+    <TextView
+        android:id="@+id/high_score"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/start_btn"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30dp"
+        android:text="High Score is:0"
+        android:textSize="20dp" />
+
+    <Button
+        android:id="@+id/start_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="Start Quiz" />
 
 
 </RelativeLayout>
