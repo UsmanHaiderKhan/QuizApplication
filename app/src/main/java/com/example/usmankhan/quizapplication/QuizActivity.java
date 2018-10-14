@@ -1,5 +1,6 @@
 package com.example.usmankhan.quizapplication;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +18,8 @@ import java.util.List;
 
 public class QuizActivity extends AppCompatActivity {
 
+    public static final String Extra_Socre="extraSore";
+
     private TextView questiontext, scoretext, question_count_text, time_text, score_counts;
     private RadioGroup rb;
     private RadioButton rb1, rb2, rb3, rb4;
@@ -31,6 +34,8 @@ public class QuizActivity extends AppCompatActivity {
 
     private int Score;
     private boolean answered;
+
+    private long backPressedTime;
 
 
     @Override
@@ -148,6 +153,21 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     public void finishQuiz() {
+        Intent resultIntent=new Intent();
+        resultIntent.putExtra( Extra_Socre,Score );
+        setResult( RESULT_OK ,resultIntent);
         finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+         if(backPressedTime+2000>System.currentTimeMillis()){
+              finishQuiz();
+         }else
+         {
+             Toast.makeText( this,"Press Again to CAncle that Quiz",Toast.LENGTH_SHORT ).show();
+
+         }
+         backPressedTime=System.currentTimeMillis();
     }
 }
