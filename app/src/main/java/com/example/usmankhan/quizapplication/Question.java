@@ -1,6 +1,9 @@
 package com.example.usmankhan.quizapplication;
 
-public class Question {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Question implements Parcelable {
     private String Question;
     private String Option1;
     private String Option2;
@@ -66,5 +69,15 @@ public class Question {
 
     public void setAnswerNr(int answerNr) {
         AnswerNr = answerNr;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+
     }
 }
