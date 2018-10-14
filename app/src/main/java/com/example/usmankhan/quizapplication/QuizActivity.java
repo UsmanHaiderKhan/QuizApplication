@@ -3,6 +3,7 @@ package com.example.usmankhan.quizapplication;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -12,13 +13,22 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 public class QuizActivity extends AppCompatActivity {
 
-    public static final String Extra_Socre="extraSore";
+    public static final String Extra_Socre = "extraSore";
+    private static final long COUNT_DOWN_MILLISECOND = 30000;
+    private static final String KEY_SCORE = "KeyScore";
+    private static final String KEY_QUESTION_COUNT = "KeyQuestionCount";
+    private static final String KEY_MILLIES_LEFT = "KeyMilliesLeft";
+    private static final String KEY_ANSWERED = "KeyAnswer";
+    private static final String KEY_QUESTION_LIST = "KeyQuestionList";
+
 
     private TextView questiontext, scoretext, question_count_text, time_text, score_counts;
     private RadioGroup rb;
@@ -26,8 +36,11 @@ public class QuizActivity extends AppCompatActivity {
     private Button confirmNext;
 
     private ColorStateList default_Text_Color;
+    private ColorStateList defaultColorCD;
+    private CountDownTimer countDownTimer;
+    private long timeLeftinMillisecond;
 
-    private List<Question> questionList;
+    private ArrayList<Question> questionList;
     private int question_Counter;
     private int totalQuestion_Count;
     private Question current_Question;
@@ -54,14 +67,32 @@ public class QuizActivity extends AppCompatActivity {
         confirmNext = (Button) findViewById( R.id.confirm_btn );
 
         default_Text_Color = rb1.getTextColors();
+        defaultColorCD = time_text.getTextColors();
 
 
-        QuizHelper db = new QuizHelper( this );
-        questionList = db.getAllQuestions();
-        totalQuestion_Count = questionList.size();
-        Collections.shuffle( questionList );
+        if (savedInstanceState == null) {
+            QuizHelper db = new QuizHelper( this );
+            questionList = db.getAllQuestions();
+            totalQuestion_Count = questionList.size();
+            Collections.shuffle( questionList );
+            ShowNextQuestion();
+        } else {
+            questionList = savedInstanceState.getParcelableArrayList( KEY_QUESTION_LIST );
+            //if (questionList==null){finish();}
+            totalQuestion_Count = questionList.size();
+            question_Counter = savedInstanceState.getInt( KEY_QUESTION_COUNT );
+            current_Question = questionList.get( question_Counter - 1 );
+            Score=savedInstanceState.getInt(KEY_SCORE);
+             timeLeftinMillisecond=savedInstanceState.getInt(KEY_MILLIES_LEFT  );
+             answered=savedInstanceState.getBoolean( KEY_ANSWERED );
+             if (!answered){
+                 startCountDown();
+             }else {
+                 UpdateCountDownText();
+                 showSolution();
+             }
+        }
 
-        ShowNextQuestion();
 
         confirmNext.setOnClickListener( new View.OnClickListener() {
             @Override
@@ -101,13 +132,48 @@ public class QuizActivity extends AppCompatActivity {
             question_count_text.setText( "Question: " + question_Counter + "/" + totalQuestion_Count );
             answered = false;
             confirmNext.setText( "confirmed" );
+            timeLeftinMillisecond = COUNT_DOWN_MILLISECOND;
+            startCountDown();
         } else {
             finishQuiz();
         }
     }
 
+    private void startCountDown() {
+        countDownTimer = new CountDownTimer( timeLeftinMillisecond, 1000 ) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                timeLeftinMillisecond = millisUntilFinished;
+                UpdateCountDownText();
+            }
+
+            @Override
+            public void onFinish() {
+                timeLeftinMillisecond = 0;
+                UpdateCountDownText();
+                checkAnswer();
+
+            }
+        }.start();
+    }
+
+    private void UpdateCountDownText() {
+        int millies = (int) (timeLeftinMillisecond / 1000) / 60;
+        int seconds = (int) (timeLeftinMillisecond / 1000) % 60;
+        String TimeFormated = String.format( Locale.getDefault(), "%02d:%02d", millies, seconds );
+        time_text.setText( TimeFormated );
+        if (timeLeftinMillisecond < 10000) {
+            time_text.setTextColor( Color.RED );
+        } else {
+            time_text.setTextColor( defaultColorCD );
+        }
+
+    }
+
     private void checkAnswer() {
         answered = true;
+
+        countDownTimer.cancel();
 
         RadioButton radioButton = findViewById( rb.getCheckedRadioButtonId() );
         int AnswerNr = rb.indexOfChild( radioButton ) + 1;
@@ -153,21 +219,39 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     public void finishQuiz() {
-        Intent resultIntent=new Intent();
-        resultIntent.putExtra( Extra_Socre,Score );
-        setResult( RESULT_OK ,resultIntent);
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra( Extra_Socre, Score );
+        setResult( RESULT_OK, resultIntent );
         finish();
     }
 
     @Override
     public void onBackPressed() {
-         if(backPressedTime+2000>System.currentTimeMillis()){
-              finishQuiz();
-         }else
-         {
-             Toast.makeText( this,"Press Again to CAncle that Quiz",Toast.LENGTH_SHORT ).show();
+        if (backPressedTime + 2000 > System.currentTimeMillis()) {
+            finishQuiz();
+        } else {
+            Toast.makeText( this, "Press Again to CAncle that Quiz", Toast.LENGTH_SHORT ).show();
 
-         }
-         backPressedTime=System.currentTimeMillis();
+        }
+        backPressedTime = System.currentTimeMillis();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState( outState );
+        outState.putInt( KEY_SCORE, Score );
+        outState.putInt( KEY_QUESTION_COUNT, question_Counter );
+        outState.putBoolean( KEY_ANSWERED, answered );
+        outState.putLong( KEY_MILLIES_LEFT, timeLeftinMillisecond );
+        outState.putParcelableArrayList( KEY_QUESTION_LIST, questionList );
+
     }
 }
