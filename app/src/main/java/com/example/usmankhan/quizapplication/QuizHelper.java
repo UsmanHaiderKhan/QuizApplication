@@ -36,7 +36,8 @@ public class QuizHelper extends SQLiteOpenHelper {
                 QuestionTable.COLUMN_OPTION2 + " TEXT, " +
                 QuestionTable.COLUMN_OPTION3 + " TEXT, " +
                 QuestionTable.COLUMN_OPTION4 + " TEXT, " +
-                QuestionTable.COLUMN_ANSNO + " INTEGER " +
+                QuestionTable.COLUMN_ANSNO + " INTEGER, " +
+                QuestionTable.COLUMN_Difficulty + " TEXT " +
                 " ) ";
 
         db.execSQL( CREATE_QUESTION );
@@ -53,17 +54,23 @@ public class QuizHelper extends SQLiteOpenHelper {
 
 
     public void FillQuestionTable() {
-        Question question = new Question( "A is a Correct", "A", "B", "c", "D", 1 );
+        Question question = new Question( "EASY: A is a Correct", "A", "B", "c", "D"
+                , 1, Question.DIFFICULTY_EASY );
         AddQuestion(question);
-        Question question1 = new Question( "B is a Correct", "A", "B", "c", "D", 2 );
+
+        Question question1 = new Question( "Medium:B is a Correct", "A", "B", "c", "D", 2, Question.DIFFICULTY_MEDIUM );
         AddQuestion(question1);
-        Question question2 = new Question( "C is a Correct", "A", "B", "c", "D", 3 );
+
+        Question question2 = new Question( "HARD:C is a Correct", "A", "B", "c", "D", 3, Question.DIFFICULTY_HARD );
         AddQuestion(question2);
-        Question question3 = new Question( "D is a Correct", "A", "B", "c", "D", 4 );
+
+        Question question3 = new Question( "EASY:D is a Correct", "A", "B", "c", "D", 4, Question.DIFFICULTY_EASY );
         AddQuestion(question3);
-        Question question4 = new Question( "A is Again Correct", "A", "B", "c", "D", 1 );
+
+        Question question4 = new Question( "Medium: A is Again Correct", "A", "B", "c", "D", 1, Question.DIFFICULTY_MEDIUM );
         AddQuestion(question4);
-        Question question5 = new Question( "B is Again Correct", "A", "B", "c", "D", 2 );
+
+        Question question5 = new Question( "HARD: B is Again Correct", "A", "B", "c", "D", 2, Question.DIFFICULTY_HARD );
         AddQuestion(question5);
 
     }
@@ -77,6 +84,7 @@ public class QuizHelper extends SQLiteOpenHelper {
         cv.put( QuestionTable.COLUMN_OPTION3, question.getOption3() );
         cv.put( QuestionTable.COLUMN_OPTION4, question.getOption4() );
         cv.put( QuestionTable.COLUMN_ANSNO, question.getAnswerNr() );
+        cv.put( QuestionTable.COLUMN_Difficulty, question.getDifficulty() );
 
         db.insert( QuestionTable.TABLE_NAME,null,cv );
 
@@ -97,9 +105,37 @@ public class QuizHelper extends SQLiteOpenHelper {
              question.setOption3( cursor.getString( cursor.getColumnIndex( QuestionTable.COLUMN_OPTION3 ) ) );
              question.setOption4( cursor.getString( cursor.getColumnIndex( QuestionTable.COLUMN_OPTION4 ) ) );
              question.setAnswerNr( cursor.getInt( cursor.getColumnIndex( QuestionTable.COLUMN_ANSNO ) ) );
+                question.setDifficulty( cursor.getString( cursor.getColumnIndex( QuestionTable.COLUMN_Difficulty ) ) );
              questionsList.add( question );
 
             }while (cursor.moveToNext());
+        }
+        cursor.close();
+        return questionsList;
+
+    }
+
+    public ArrayList<Question> getQuestions(String difficulty) {
+        ArrayList<Question> questionsList = new ArrayList<>();
+
+        db = getReadableDatabase();
+        String[] selectionArgs = new String[]{difficulty};
+        Cursor cursor = db.rawQuery( "Select * from " + QuestionTable.TABLE_NAME +
+                " WHERE " + QuestionTable.COLUMN_Difficulty + " = ?", selectionArgs );
+
+        if (cursor.moveToFirst()) {
+            do {
+                Question question = new Question();
+                question.setQuestion( cursor.getString( cursor.getColumnIndex( QuestionTable.COLUMN_NAME ) ) );
+                question.setOption1( cursor.getString( cursor.getColumnIndex( QuestionTable.COLUMN_OPTION1 ) ) );
+                question.setOption2( cursor.getString( cursor.getColumnIndex( QuestionTable.COLUMN_OPTION2 ) ) );
+                question.setOption3( cursor.getString( cursor.getColumnIndex( QuestionTable.COLUMN_OPTION3 ) ) );
+                question.setOption4( cursor.getString( cursor.getColumnIndex( QuestionTable.COLUMN_OPTION4 ) ) );
+                question.setAnswerNr( cursor.getInt( cursor.getColumnIndex( QuestionTable.COLUMN_ANSNO ) ) );
+                question.setDifficulty( cursor.getString( cursor.getColumnIndex( QuestionTable.COLUMN_Difficulty ) ) );
+                questionsList.add( question );
+
+            } while (cursor.moveToNext());
         }
         cursor.close();
         return questionsList;
