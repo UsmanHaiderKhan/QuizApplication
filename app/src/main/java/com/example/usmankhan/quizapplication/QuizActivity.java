@@ -23,6 +23,7 @@ public class QuizActivity extends AppCompatActivity {
 
     public static final String Extra_Socre = "extraSore";
     private static final long COUNT_DOWN_MILLISECOND = 30000;
+
     private static final String KEY_SCORE = "KeyScore";
     private static final String KEY_QUESTION_COUNT = "KeyQuestionCount";
     private static final String KEY_MILLIES_LEFT = "KeyMilliesLeft";
@@ -82,15 +83,15 @@ public class QuizActivity extends AppCompatActivity {
             totalQuestion_Count = questionList.size();
             question_Counter = savedInstanceState.getInt( KEY_QUESTION_COUNT );
             current_Question = questionList.get( question_Counter - 1 );
-            Score=savedInstanceState.getInt(KEY_SCORE);
-             timeLeftinMillisecond=savedInstanceState.getInt(KEY_MILLIES_LEFT  );
-             answered=savedInstanceState.getBoolean( KEY_ANSWERED );
-             if (!answered){
-                 startCountDown();
-             }else {
-                 UpdateCountDownText();
-                 showSolution();
-             }
+            Score = savedInstanceState.getInt( KEY_SCORE );
+            timeLeftinMillisecond = savedInstanceState.getInt( KEY_MILLIES_LEFT );
+            answered = savedInstanceState.getBoolean( KEY_ANSWERED );
+            if (!answered) {
+                startCountDown();
+            } else {
+                UpdateCountDownText();
+                showSolution();
+            }
         }
 
 
