@@ -25,11 +25,7 @@ public class Notify extends AppCompatActivity {
                 getNotification();
             }
         } );
-
-
     }
-
-
     private void getNotification() {
         Intent intent = new Intent( this, Notify.class );
         PendingIntent pendingIntent = PendingIntent.getActivity( this, (int) System.currentTimeMillis(), intent, 0 );
