@@ -32,6 +32,14 @@
         android:freezesText="true" />
 
     <TextView
+        android:id="@+id/category_text_View"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/difficulty_text_View"
+        android:text="Question Category: "
+        android:freezesText="true" />
+
+    <TextView
         android:id="@+id/time_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
