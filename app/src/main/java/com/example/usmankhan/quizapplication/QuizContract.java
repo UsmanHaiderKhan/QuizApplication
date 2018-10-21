@@ -9,7 +9,7 @@ public final class QuizContract {
 
     public static class QuizCategoryTable implements BaseColumns {
         public static final String TABLE_NAME = "quiz_categories";
-        public static final String COLUMN_NAME = "name";
+        public static final String COLUMN_NAME = "Name";
 
     }
 
