@@ -31,5 +31,11 @@ public class QuizCategory {
     public void setName(String name) {
         Name = name;
     }
+
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }
 
